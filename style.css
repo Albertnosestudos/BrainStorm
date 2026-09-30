@@ -1614,6 +1614,31 @@ body.sem-tesoura .tesoura-corte {
     0 18px 40px rgba(0, 0, 0, 0.5);
 }
  
+.no-pilar.escurecido,
+.no-filho.escurecido,
+.no-neto.escurecido,
+.no-solto.escurecido {
+  opacity: 0.68;
+  filter: grayscale(0.55);
+  pointer-events: auto;
+}
+ 
+.no-pilar.no-ramo,
+.no-filho.no-ramo,
+.no-neto.no-ramo {
+  opacity: 1;
+  z-index: 5;
+}
+ 
+.btn-add-filho.escurecido,
+.btn-add-neto.escurecido {
+  opacity: 0.16;
+}
+ 
+#roadmap-linhas .linha-escura {
+  stroke-opacity: 0.12;
+}
+ 
 .btn-add-filho,
 .btn-add-neto {
   position: absolute;

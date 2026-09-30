@@ -68,7 +68,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (targetViewId === "view-roadmap") {
           setTimeout(() => {
             renderizarRoadmap();
-            abrirVistaInicial();
+            if (prefs.autoEncaixar) {
+              encaixarMapa();
+            } else {
+              aplicarTransform();
+            }
           }, 50);
         }
       }
@@ -1091,10 +1095,6 @@ document.addEventListener("DOMContentLoaded", () => {
      }
  
       function abrirVistaInicial() {
-        colapsarTodosOsRamos();
-        if (layoutPaisBaguncado()) {
-          organizarPaisEmAnel();
-        }
         garantirPosicoes();
         renderizarRoadmap();
         encaixarMapa();
@@ -1140,12 +1140,53 @@ document.addEventListener("DOMContentLoaded", () => {
         return !no || no.minimizado !== true;
       }
  
-  function marcarFoco(id) {
-    zoomPilarId = id;
-    document.querySelectorAll(".no-pilar, .no-filho, .no-neto").forEach((el) => {
-      el.classList.toggle("focado", el.dataset.id === id);
-    });
-  }
+   function idsDoRamoFocado() {
+     const no = acharNoPorId(zoomPilarId);
+     if (!no) {
+       return null;
+     }
+     const ids = {};
+     function marcar(n) {
+       if (!n) {
+         return;
+       }
+       ids[n.id] = true;
+       (n.filhos || []).forEach(marcar);
+     }
+     if (no.tipo === "pai") {
+       marcar(no.ref);
+     } else if (no.tipo === "filho") {
+       ids[no.pilar.id] = true;
+       marcar(no.ref);
+     } else if (no.tipo === "neto") {
+       ids[no.pilar.id] = true;
+       ids[no.filho.id] = true;
+       marcar(no.ref);
+     } else {
+       marcar(no.ref);
+     }
+     return ids;
+   }
+ 
+   function aplicarDestaqueRamo() {
+     const ramo = idsDoRamoFocado();
+     canvas.querySelectorAll(".no-pilar, .no-filho, .no-neto").forEach((el) => {
+       const ligado = Boolean(ramo && ramo[el.dataset.id]);
+       el.classList.toggle("focado", el.dataset.id === zoomPilarId);
+       el.classList.toggle("escurecido", Boolean(ramo) && !ligado);
+       el.classList.toggle("no-ramo", ligado);
+     });
+     canvas.querySelectorAll(".btn-add-filho, .btn-add-neto").forEach((el) => {
+       const id = el.dataset.ramo;
+       el.classList.toggle("escurecido", Boolean(ramo) && !(id && ramo[id]));
+     });
+   }
+ 
+    function marcarFoco(id) {
+      zoomPilarId = id;
+      aplicarDestaqueRamo();
+      desenharLacos();
+    }
  
   function boundsDoPilar(pilar) {
     let minX = pilar.x;
@@ -1265,7 +1306,8 @@ document.addEventListener("DOMContentLoaded", () => {
  
   function zoomOut() {
     zoomPilarId = null;
-    document.querySelectorAll(".no-pilar, .no-filho, .no-neto").forEach((el) => el.classList.remove("focado"));
+    aplicarDestaqueRamo();
+    desenharLacos();
     encaixarMapa();
   }
  
@@ -1365,7 +1407,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return pilar.cores.borda || pilar.cores.filho || pilar.cores.pai;
   }
  
-  function galho(ax, ay, bx, by, cor, grossura, info) {
+  function galho(ax, ay, bx, by, cor, grossura, info, escurecer) {
     const dx = bx - ax;
     const dy = by - ay;
     const mx = ax + dx * 0.45;
@@ -1379,8 +1421,11 @@ document.addEventListener("DOMContentLoaded", () => {
     glow.setAttribute("fill", "none");
     glow.setAttribute("stroke", cor);
     glow.setAttribute("stroke-width", String(grossura + 10));
-    glow.setAttribute("stroke-opacity", "0.22");
+    glow.setAttribute("stroke-opacity", escurecer ? "0.06" : "0.22");
     glow.setAttribute("stroke-linecap", "round");
+    if (escurecer) {
+      glow.classList.add("linha-escura");
+    }
     svgLacos.appendChild(glow);
  
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -1390,6 +1435,10 @@ document.addEventListener("DOMContentLoaded", () => {
     path.setAttribute("stroke-width", String(grossura));
     path.setAttribute("stroke-linecap", "round");
     path.setAttribute("stroke-linejoin", "round");
+    if (escurecer) {
+      path.classList.add("linha-escura");
+      path.setAttribute("stroke-opacity", "0.14");
+    }
     svgLacos.appendChild(path);
  
     if (info) {
@@ -1444,17 +1493,18 @@ document.addEventListener("DOMContentLoaded", () => {
     svgLacos.setAttribute("height", String(CANVAS_H));
     svgLacos.innerHTML = "";
     linhasHit = [];
+    const ramo = idsDoRamoFocado();
  
      pilares.forEach((pilar) => {
        const cor = corLinha(pilar);
        const px = pilar.x + 100;
        const py = pilar.y + 38;
-       galho(CENTRO_X, CENTRO_Y, px, py, cor, 7);
+       galho(CENTRO_X, CENTRO_Y, px, py, cor, 7, null, Boolean(ramo) && !ramo[pilar.id]);
  
         if (ramoAberto(pilar)) {
           pilar.filhos.forEach((filho, i) => {
             const pos = posicaoFilho(pilar, i, pilar.filhos.length);
-            galho(px, py, pos.x + 75, pos.y + 25, cor, 5, { tipo: "pai-filho", pilarId: pilar.id, filhoId: filho.id });
+            galho(px, py, pos.x + 75, pos.y + 25, cor, 5, { tipo: "pai-filho", pilarId: pilar.id, filhoId: filho.id }, Boolean(ramo) && !ramo[filho.id]);
             if (!subramoAberto(filho)) {
               return;
             }
@@ -1465,7 +1515,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 pilarId: pilar.id,
                 filhoId: filho.id,
                 netoId: neto.id
-              });
+              }, Boolean(ramo) && !ramo[neto.id]);
             });
           });
         }
@@ -1477,7 +1527,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!a || !b) {
         return;
       }
-      galho(a.x, a.y, b.x, b.y, lig.cor || "#e8b44a", 3.4, { tipo: "extra", index: idx });
+      galho(a.x, a.y, b.x, b.y, lig.cor || "#e8b44a", 3.4, { tipo: "extra", index: idx }, Boolean(ramo) && !ramo[lig.de] && !ramo[lig.para]);
     });
  
     if (ligandoExtra && ligandoExtra.x != null) {
@@ -2668,6 +2718,7 @@ document.addEventListener("DOMContentLoaded", () => {
          const btnNeto = document.createElement("button");
          btnNeto.type = "button";
          btnNeto.className = "btn-add-neto";
+         btnNeto.dataset.ramo = filhoData.id;
          btnNeto.textContent = "+";
          btnNeto.title = "Derivar deste filho";
          btnNeto.style.left = (pos.x + (ladoFilho > 0 ? 158 : -28)) + "px";
@@ -2684,6 +2735,7 @@ document.addEventListener("DOMContentLoaded", () => {
        const btnFilho = document.createElement("button");
        btnFilho.type = "button";
        btnFilho.className = "btn-add-filho";
+       btnFilho.dataset.ramo = pilar.id;
        btnFilho.textContent = "+";
        btnFilho.title = "Adicionar filho neste pai";
        btnFilho.style.left = (pilar.x + (ladoPai > 0 ? 210 : -28)) + "px";
@@ -2746,6 +2798,7 @@ document.addEventListener("DOMContentLoaded", () => {
      });
  
      desenharLacos();
+     aplicarDestaqueRamo();
      agendarSalvar();
    }
  
@@ -3026,6 +3079,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnDuplicar = document.getElementById("btn-duplicar-jogo");
   if (btnDuplicar) {
     btnDuplicar.addEventListener("click", duplicarJogoAtual);
+  }
+  const btnReorganizar = document.getElementById("btn-reorganizar");
+  if (btnReorganizar) {
+    btnReorganizar.addEventListener("click", () => {
+      empilharUndo();
+      organizarPaisEmAnel();
+      pilares.forEach((pilar) => {
+        if (ramoAberto(pilar)) {
+          espalharFilhos(pilar);
+        }
+      });
+      garantirPosicoes();
+      renderizarRoadmap();
+      encaixarMapa();
+      aposMudarMapa();
+    });
   }
   const btnDesfazer = document.getElementById("btn-desfazer");
   if (btnDesfazer) {
