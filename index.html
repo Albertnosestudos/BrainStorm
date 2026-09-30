@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+ 
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrainStorm</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231a0610'/%3E%3Ccircle cx='32' cy='32' r='8' fill='%23c41e3a'/%3E%3Cpath d='M32 8v10M32 46v10M8 32h10M46 32h10' stroke='%23e8b44a' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+ 
+<body>
+ 
+    <div class="app">
+ 
+        <aside class="menu-rail" id="menu-rail">
+            <button type="button" class="btn-menu" id="btn-menu" aria-label="Abrir menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </aside>
+ 
+        <aside class="sidebar">
+            <div class="sidebar-topo">
+                <div class="sidebar-logo">
+                    <span>BrainStorm</span>
+                </div>
+                <button type="button" class="btn-fechar-menu" id="btn-fechar-menu" aria-label="Recolher menu">‹</button>
+            </div>
+            <div class="sidebar-autor" id="sidebar-autor">
+                <p class="sidebar-autor-dica" id="sidebar-autor-dica">Defina seu nome em Configuracoes</p>
+                <p class="sidebar-autor-nome" id="sidebar-autor-nome" hidden></p>
+                <p class="sidebar-autor-email" id="sidebar-autor-email" hidden></p>
+                <p class="sidebar-autor-recado" id="sidebar-autor-recado" hidden></p>
+            </div>
+ 
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-view="view-ideias">
+                    <span>Ideias</span>
+                </button>
+ 
+                <button class="nav-item" data-view="view-visao-solo">
+                    <span>Dashboard</span>
+                </button>
+ 
+                <button class="nav-item" data-view="view-roadmap">
+                    <span>Roadmap</span>
+                </button>
+ 
+                <button class="nav-item" data-view="view-config">
+                    <span>Configuracoes</span>
+                </button>
+            </nav>
+        </aside>
+ 
+        <main class="conteudo">
+ 
+            <section class="view active" id="view-ideias">
+ 
+                <div class="ideias-de-jogos">
+                    <div class="ideias-titulo">
+                        <h1>Rascunho das ideias</h1>
+                        <p>Nome e uma breve descricao do jogo. O resto voce completa no Roadmap.</p>
+                    </div>
+                </div>
+ 
+                <div class="lista-ideias">
+                    <p class="lista-vazia" id="ideias-vazia">Nenhuma ideia ainda. Cria a primeira para abrir o Roadmap.</p>
+                    <button class="btn-add-ideia">
+                        <span class="icone">+</span>
+                        <span>Adicionar<br>Nova Ideia</span>
+                    </button>
+                </div>
+ 
+                <div class="modal-ideia">
+                    <form class="form-ideia">
+                        <h2 id="titulo-modal-ideia">Nova ideia</h2>
+ 
+                        <label for="nome-ideia">Nome</label>
+                        <input type="text" id="nome-ideia" placeholder="Nome da ideia">
+                        <p class="erro-nome"></p>
+ 
+                        <label for="descricao-ideia">Descricao</label>
+                        <textarea id="descricao-ideia" placeholder="Descreva sua ideia"></textarea>
+ 
+                        <button type="button" class="btn-cancelar">Cancelar</button>
+                        <button type="submit" id="btn-salvar-ideia">Criar ideia</button>
+                    </form>
+                </div>
+ 
+            </section>
+ 
+            <section class="view" id="view-visao-solo">
+ 
+                <header class="dash-topo">
+                    <div class="dash-saudacao">
+                        <h1 id="dash-saudacao-titulo">Dashboard</h1>
+                        <p class="dash-resumo" id="dash-resumo">0 tarefas · 0 bloqueios</p>
+                    </div>
+                    <div class="dash-busca-wrap">
+                        <input type="search" class="input-busca" id="busca-global" placeholder="Buscar tarefas, notas, bloqueios, ideias..." autocomplete="off">
+                        <ul class="busca-dropdown" id="busca-dropdown" hidden></ul>
+                    </div>
+                    <button type="button" class="btn-captura-rapida" id="btn-captura-rapida">Nota Rápida</button>
+                </header>
+ 
+                <div class="dash-grid">
+                    <div class="lista-de-tarefas">
+                        <div class="card-cabecalho">
+                            <h3>Minhas tarefas</h3>
+                            <span class="card-contador" id="contador-tarefas">0/0</span>
+                        </div>
+                        <ul class="lista-task">
+                        </ul>
+                        <p class="lista-vazia" id="tarefas-vazia">Nenhuma tarefa. Adiciona o que precisa fazer hoje.</p>
+                        <button type="button" class="btn-add-task">+ Adicionar Tarefa</button>
+                    </div>
+ 
+                    <div class="captura-card">
+                        <div class="bloqueio">
+                            <div class="card-cabecalho">
+                                <h3>Bloqueios em aberto</h3>
+                            </div>
+                            <ul class="lista-bloqueios">
+                            </ul>
+                            <p class="lista-vazia" id="bloqueios-vazia">Nenhum bloqueio em aberto.</p>
+                            <button type="button" class="btn-add-bloqueio">+ Bloqueio</button>
+                        </div>
+                        <div class="decision">
+                            <div class="card-cabecalho">
+                                <h3>Notas rapidas</h3>
+                            </div>
+                            <ul class="notas-rapidas-ul">
+                            </ul>
+                            <p class="lista-vazia" id="notas-vazia">Nenhuma nota rapida.</p>
+                            <button type="button" class="adicionar-nota">+ Nota</button>
+                        </div>
+                    </div>
+ 
+                    <div class="atividade-recente">
+                        <h3>Atividade Recente</h3>
+                        <ul class="lista-atividade">
+                        </ul>
+                        <p class="lista-vazia" id="atividade-vazia">Nada por aqui ainda.</p>
+                    </div>
+ 
+                    <div class="cronometro-ferramentas">
+                        <div class="cronometro-topo">
+                            <div>
+                                <h3>Tempo por ferramenta</h3>
+                                <p class="tempo-hoje">Tempo de hoje: 0s</p>
+                                <div class="meta-hoje">
+                                    <div class="meta-topo">
+                                        <span>Meta do dia</span>
+                                        <input type="number" id="meta-hoje" min="1" value="8">
+                                        <span>h</span>
+                                    </div>
+                                    <div class="meta-barra">
+                                        <div class="meta-fill"></div>
+                                    </div>
+                                    <p class="meta-status">0s / 8h</p>
+                                </div>
+                            </div>
+                            <div class="sessao-ativa">
+                                <p>Sessao ativa: <span id="tempo-sessao">0s</span></p>
+                                <div class="ferramenta-box">
+                                    <select id="ferramenta-ativa">
+                                        <option value="vs">VS Code</option>
+                                        <option value="godot">Godot</option>
+                                        <option value="blender">Blender</option>
+                                        <option value="pixel">Pixel</option>
+                                    </select>
+                                    <input type="text" id="nova-ferramenta" placeholder="Nova ferramenta">
+                                    <button type="button" class="btn-add-ferramenta">+</button>
+                                    <button type="button" class="btn-del-ferramenta">−</button>
+                                </div>
+                                <button type="button" class="btn-sessao">Iniciar nova sessao</button>
+                            </div>
+                        </div>
+                        <div class="barra-tempo">
+                            <div class="seg vs" data-ferramenta="vs" data-nome="VS Code" style="width: 25%;">VS Code: 0s</div>
+                            <div class="seg godot" data-ferramenta="godot" data-nome="Godot" style="width: 25%;">Godot: 0s</div>
+                            <div class="seg blender" data-ferramenta="blender" data-nome="Blender" style="width: 25%;">Blender: 0s</div>
+                            <div class="seg pixel" data-ferramenta="pixel" data-nome="Pixel" style="width: 25%;">Pixel: 0s</div>
+                        </div>
+                    </div>
+                </div>
+ 
+                <div class="modal-task">
+                    <form class="form-task">
+                        <h2>Nova tarefa</h2>
+                        <label for="nome-da-task">Descreva a tarefa</label>
+                        <input type="text" id="nome-da-task" placeholder="Ex: ajustar o pulo do personagem">
+                        <p class="form-task-label">Prioridade</p>
+                        <label>
+                            <input type="radio" name="prioridade" value="alta" checked>
+                            Alta
+                        </label>
+                        <label>
+                            <input type="radio" name="prioridade" value="media">
+                            Media
+                        </label>
+                        <label>
+                            <input type="radio" name="prioridade" value="baixa">
+                            Baixa
+                        </label>
+                        <button type="submit">Criar tarefa</button>
+                        <button type="button" class="btn-cancelar-tarefa">Cancelar</button>
+                    </form>
+                </div>
+ 
+                <div class="modal-bloqueio">
+                    <form class="form-bloqueio">
+                        <h2>Novo bloqueio</h2>
+                        <label for="texto-bloqueio">O que te trava?</label>
+                        <textarea id="texto-bloqueio" placeholder="Ex: nao sei como fazer o pulo do personagem"></textarea>
+                        <button type="submit">Criar</button>
+                        <button type="button" class="btn-cancelar-bloqueio">Cancelar</button>
+                    </form>
+                </div>
+ 
+                <div class="modal-notas">
+                    <form class="form-notas">
+                        <h2>Novo Lembrete</h2>
+                        <label for="texto-notas-rapidas">O que voce esta pensando agora?</label>
+                        <textarea id="texto-notas-rapidas" placeholder="Ex: Trocar o nome da loja / retirar a arvore do lugar"></textarea>
+                        <button type="submit">Criar</button>
+                        <button type="button" class="btn-cancelar-notas">Cancelar</button>
+                    </form>
+                </div>
+            </section>
+ 
+            <section class="view sem-jogo" id="view-roadmap">
+                <div class="minha-secao">
+                     <div class="roadmap-toolbar">
+                         <div class="jogo-seletor-toolbar" id="roadmap-centro">
+                             <span class="jogo-seletor-label">JOGO</span>
+                             <button type="button" class="jogo-seletor-btn" id="jogo-seletor-btn">Escolha um jogo</button>
+                             <ul class="jogo-seletor-lista" id="jogo-seletor-lista" hidden></ul>
+                             <select id="jogo-atual" name="jogo-atual" hidden>
+                                 <option value="">Escolha um jogo</option>
+                             </select>
+                         </div>
+                         <button type="button" class="btn-add-pilar">+ Novo pai</button>
+                         <button type="button" class="btn-toolbar" id="btn-duplicar-jogo">Duplicar jogo</button>
+                         <button type="button" class="btn-toolbar" id="btn-desfazer" title="Ctrl+Z">Desfazer</button>
+                         <button type="button" class="btn-toolbar" id="btn-refazer" title="Ctrl+Y" disabled>Refazer</button>
+                         <button type="button" class="btn-toolbar" id="btn-exportar-mapa">Exportar mapa</button>
+                         <button type="button" class="btn-toolbar" id="btn-ficha">Ficha</button>
+                         <div class="zoom-controles">
+                             <button type="button" class="btn-zoom-out" id="btn-zoom-out">-</button>
+                             <span class="zoom-valor" id="zoom-valor">100%</span>
+                             <button type="button" class="btn-zoom-in" id="btn-zoom-in">+</button>
+                         </div>
+                          <p class="roadmap-dica">Clique no no para zoom. Arraste o fundo para viajar. Scroll = zoom no cursor. Duplo clique no filho/neto esconde o que esta abaixo.</p>
+                     </div>
+  
+                      <div class="roadmap-viewport" id="roadmap-viewport">
+                          <button type="button" class="tesoura-corte" id="tesoura-corte" title="Cortar linha">✂</button>
+                          <div class="roadmap-canvas" id="roadmap-canvas">
+                              <div class="hub-jogo" id="hub-jogo">JOGO</div>
+                          </div>
+                     </div>
+                </div>
+ 
+                 <div class="combo-cores" id="combo-cores" hidden>
+                     <p class="combo-cores-titulo">Cores do pilar</p>
+                     <div class="paleta-opcoes" id="combo-cores-lista"></div>
+                     <div class="combo-cores-edit">
+                         <label>Pai <input type="color" id="combo-cor-pai" value="#01516b"></label>
+                         <label>Filho <input type="color" id="combo-cor-filho" value="#016b8f"></label>
+                         <label>Linha <input type="color" id="combo-cor-linha" value="#2a9bb8"></label>
+                     </div>
+                 </div>
+                 <div class="painel-hover-zona" id="painel-hover-zona" title="Abrir ficha"></div>
+                <section class="painel-direita" id="painel-direita">
+                    <div class="painel-direita-container">
+                        <div class="painel-direita-header">
+                            <h2>Ficha tecnica do jogo</h2>
+                            <button type="button" class="btn-fechar-ficha" id="btn-fechar-ficha">Fechar</button>
+                        </div>
+                        <nav class="painel-direita-nav">
+                            <div class="abas-atras">
+                                <button class="painel-direita-button" data-tab="economia">Pontuacao / Economia</button>
+                                <button class="painel-direita-button" data-tab="mundo">Mundo & Level Design</button>
+                                <button class="painel-direita-button" data-tab="audio">Audio</button>
+                                <button class="painel-direita-button" data-tab="monetizacao">Receita</button>
+                                <button class="painel-direita-button" data-tab="progressao">Sistema & Progresso</button>
+                            </div>
+                            <div class="abas-frente">
+                                <button class="painel-direita-button active" data-tab="historia">Historia</button>
+                                <button class="painel-direita-button" data-tab="gameplay">Gameplay</button>
+                                <button class="painel-direita-button" data-tab="mecanicas">Mecanicas</button>
+                                <button class="painel-direita-button" data-tab="artes">Artes & Visual</button>
+                            </div>
+                        </nav>
+                        <div class="painel-direita-content">
+                            <div class="aba-conteudo ativa" id="historia">
+                                <h3>Sinopse / Premissa</h3>
+                                <textarea placeholder="Descreva a ideia principal do jogo"></textarea>
+                                <h4>Mundo / Ambientacao</h4>
+                                <textarea placeholder="Descreva o mundo e a Ambientacao"></textarea>
+                                <h4>Personagens principais</h4>
+                                <textarea placeholder="Nome, papel e motivacao dos personagens"></textarea>
+                                <h4>Timeline</h4>
+                                <textarea
+                                    placeholder="Descreva Eventos importantes e ordem cronologica da historia."></textarea>
+                                <h4>Tom / Atmosfera</h4>
+                                <textarea placeholder="Descreva do tom e da atmosfera do jogo"></textarea>
+                            </div>
+                            <div class="aba-conteudo" id="gameplay">
+                                <h3>Gameplay</h3>
+                                <textarea placeholder="Visao geral e o sentir do jogo."></textarea>
+                                <h4>Core Loop</h4>
+                                <textarea
+                                    placeholder="Core Loop - O que o jogador faz a cada 30 segundos, 1 minuto e 5 minutos."></textarea>
+                                <h4>Objetivo Principal</h4>
+                                <textarea placeholder="Descricao do Objetivo principal do Jogo."></textarea>
+                                <h4>Objetivos Secundarios</h4>
+                                <textarea placeholder="Objetivos secundarios"></textarea>
+                                <h4>Progressao</h4>
+                                <textarea placeholder="Niveis, desbloqueios e Upgrades."></textarea>
+                                <h4>Genero / Referencias</h4>
+                                <textarea placeholder="Genero do Jogo e Referencias utilizadas."></textarea>
+                            </div>
+                            <div class="aba-conteudo" id="mecanicas">
+                                <h3>Mecanicas</h3>
+                                <textarea placeholder="Lista e Descricao das principais mecanicas."></textarea>
+                                <h4>Lista de Mecanicas</h4>
+                                <textarea placeholder="Combate, movimentacao, crafting, exploracao, etc."></textarea>
+                                <h4>Como cada mecanica funciona</h4>
+                                <textarea
+                                    placeholder="Explique como funciona, quais sao os inputs do jogador e o que essa mecanica resolve dentro do jogo."></textarea>
+                                <h4>Interacoes entre Mecanicas</h4>
+                                <textarea
+                                    placeholder="Interacoes entre Mecanicas Exemplo: stamina afeta combate e exploracao."></textarea>
+                                <h4>Pontuacao / Moedas / Economia</h4>
+                                <textarea
+                                    placeholder="Pontuacao / Moedas / Economia Explique a funcao de cada Sistema."></textarea>
+                            </div>
+                            <div class="aba-conteudo" id="economia">
+                                <h3>Pontuacao / Economia</h3>
+                                <textarea placeholder="Definicao dos sistemas de pontuacao, moedas e economia."></textarea>
+                                <h4>Tipos de Moeda</h4>
+                                <textarea placeholder="Tipos de Moeda Soft currency, hard currency, xp, etc."></textarea>
+                                <h4>Como o jogador ganha moeda</h4>
+                                <textarea placeholder="Como o Jogador recebe moedas e Recursos."></textarea>
+                                <h4>Como o jogador gasta moeda</h4>
+                                <textarea placeholder="Como o jogador utiliza suas moedas."></textarea>
+                                <h4>Como o jogador perde moeda</h4>
+                                <textarea placeholder="Situacoes em que o jogador perde recursos."></textarea>
+                                <h4>Como o jogador troca moeda</h4>
+                                <textarea placeholder="Sistemas de troca e conversao."></textarea>
+                                <h4>Sistema de Pontuacao</h4>
+                                <textarea placeholder="Combo, ranking, high score, etc."></textarea>
+                                <h4>Loja</h4>
+                                <textarea placeholder="O que e vendido na loja."></textarea>
+                                <h4>Crafting</h4>
+                                <textarea placeholder="Crafting O que pode ser criado e como."></textarea>
+                                <h4>Sistema de Recompensas</h4>
+                                <textarea placeholder="Como o jogador e recompensado."></textarea>
+                                <h4>Sistema de Penalidades</h4>
+                                <textarea placeholder="Como o jogador e penalizado."></textarea>
+                                <h4>Sistema de Eventos</h4>
+                                <textarea placeholder="Como o jogador participa de eventos."></textarea>
+                                <h4>Sistema de Missoes</h4>
+                                <textarea placeholder="Como o jogador completa missoes."></textarea>
+                                <h4>Sistema de Ranking</h4>
+                                <textarea placeholder="Como o jogador e rankeado."></textarea>
+                                <h4>Sistema de Estatisticas</h4>
+                                <textarea placeholder="Como o jogador visualiza suas estatisticas."></textarea>
+                                <h4>Sistema de Feedback</h4>
+                                <textarea placeholder="Como o jogador recebe feedback."></textarea>
+                            </div>
+                            <div class="aba-conteudo" id="artes">
+                                <h3>Referencias Visuais</h3>
+                                <textarea placeholder="Area para organizar a direcao visual do jogo."></textarea>
+                                <h4>Referencias de Arte</h4>
+                                <textarea
+                                    placeholder="Referencias visuais para personagens, cenarios, objetos e estilo artistico."></textarea>
+                                <h4>Personagens</h4>
+                                <textarea placeholder="Referencias visuais dos personagens."></textarea>
+                                <h4>Interface / UI</h4>
+                                <textarea placeholder="Referencias para menus, HUD e interfaces."></textarea>
+                                <h4>Paleta de Cores</h4>
+                                <textarea placeholder="Cores e combinacoes utilizadas no projeto."></textarea>
+                            </div>
+                            <div class="aba-conteudo" id="mundo">
+                                <h3>Mundo & Level Design</h3>
+                                <textarea placeholder="Organizacao do mundo e dos niveis."></textarea>
+                                <h4>Mapa do Mundo</h4>
+                                <textarea placeholder="Descricao do mapa geral do mundo."></textarea>
+                                <h4>Level Design</h4>
+                                <textarea placeholder="Estrutura e organizacao dos niveis."></textarea>
+                                <h4>Level Art</h4>
+                                <textarea placeholder="Direcao visual dos niveis."></textarea>
+                                <h4>Boss Arena</h4>
+                                <textarea placeholder="Estrutura e caracteristicas das arenas de Boss."></textarea>
+                                <h4>Eventos do Mundo</h4>
+                                <textarea placeholder="Eventos que acontecem durante o jogo."></textarea>
+                            </div>
+                            <div class="aba-conteudo" id="progressao">
+                                <h3>Sistema & Progressao</h3>
+                                <textarea
+                                    placeholder="Sistemas responsaveis pelo crescimento e evolucao do jogador."></textarea>
+                                <h4>Habilidades</h4>
+                                <textarea placeholder="Descricao das habilidades do jogo."></textarea>
+                                <h4>Experiencia</h4>
+                                <textarea placeholder="Descricao do sistema de experiencia."></textarea>
+                                <h4>Inventario</h4>
+                                <textarea placeholder="Descricao do sistema de inventario."></textarea>
+                                <h4>Conquistas</h4>
+                                <textarea placeholder="Descricao do sistema de conquistas."></textarea>
+                                <h4>Upgrades</h4>
+                                <textarea placeholder="Melhorias e evolucao do personagem ou equipamentos."></textarea>
+                                <h4>Desbloqueios</h4>
+                                <textarea placeholder="Conteudo desbloqueado durante a progressao."></textarea>
+                            </div>
+                            <div class="aba-conteudo" id="audio">
+                                <h3>Audio</h3>
+                                <textarea placeholder="Organizacao da identidade sonora do jogo."></textarea>
+                                <h4>Trilha Sonora</h4>
+                                <textarea placeholder="Descricao da trilha sonora."></textarea>
+                                <h4>Efeitos Sonoros</h4>
+                                <textarea placeholder="Descricao dos efeitos sonoros."></textarea>
+                                <h4>Vozes</h4>
+                                <textarea placeholder="Descricao das vozes e dublagem."></textarea>
+                                <h4>Referencias de Audio</h4>
+                                <textarea placeholder="Referencias utilizadas para definir a identidade sonora."></textarea>
+                            </div>
+                            <div class="aba-conteudo" id="monetizacao">
+                                <h3>Monetizacao</h3>
+                                <textarea placeholder="Estrategia de monetizacao do jogo."></textarea>
+                                <h4>Modelo de Monetizacao</h4>
+                                <textarea placeholder="Free-to-play, premium, compra unica, DLC, etc."></textarea>
+                                <h4>Loja Virtual</h4>
+                                <textarea placeholder="Descricao do sistema de loja virtual."></textarea>
+                                <h4>Produtos</h4>
+                                <textarea placeholder="Itens ou conteudos disponiveis para compra."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+ 
+            <div class="modal-pilar">
+                <form class="form-pilar">
+                    <h2>Novo pilar (no pai)</h2>
+                     <label for="nome-pilar">Nome do pilar</label>
+                     <input type="text" id="nome-pilar" placeholder="Ex: Audio, Marketing, Historia">
+                     <label>Paleta (pai / filho / linha)</label>
+                     <div class="paleta-opcoes" id="paleta-opcoes-novo"></div>
+                     <p class="erro-pilar"></p>
+                    <button type="submit">Criar pilar</button>
+                    <button type="button" class="btn-cancelar-pilar">Cancelar</button>
+                </form>
+            </div>
+ 
+            <div class="modal-filho">
+                <form class="form-filho">
+                    <h2 id="titulo-modal-filho">Novo filho</h2>
+                    <label for="nome-filho">Nome</label>
+                    <input type="text" id="nome-filho" placeholder="Ex: Combate, Inventario, Boss">
+                    <p class="erro-filho"></p>
+                    <button type="submit">Criar</button>
+                    <button type="button" class="btn-cancelar-filho">Cancelar</button>
+                </form>
+            </div>
+ 
+            <div class="modal-nota">
+                <form class="form-nota">
+                    <h2 id="titulo-modal-nota">Observacao</h2>
+                    <textarea id="texto-nota" placeholder="Anota aqui pra nao esquecer..."></textarea>
+                    <button type="submit">Salvar</button>
+                    <button type="button" class="btn-cancelar-nota">Fechar</button>
+                </form>
+            </div>
+ 
+            <div class="modal-confirma">
+                <form class="form-confirma">
+                    <h2 id="titulo-modal-confirma">Apagar</h2>
+                    <p class="confirma-texto">Tem certeza? Essa acao pode ser desfeita.</p>
+                    <button type="button" class="btn-confirma-apagar">Apagar</button>
+                    <button type="button" class="btn-cancelar-confirma">Cancelar</button>
+                </form>
+            </div>
+ 
+            <div class="toast-restaurar" hidden>
+                <span class="toast-texto">No apagado.</span>
+                <button type="button" class="btn-restaurar">Restaurar</button>
+            </div>
+ 
+            <section class="view" id="view-config">
+                <div class="config-topo">
+                    <h1>Configuracoes</h1>
+                    <p>Aparencia, roadmap, backup dos dados e contato.</p>
+                </div>
+ 
+                <div class="config-grid">
+ 
+                    <article class="config-card">
+                        <h3>Aparencia</h3>
+                        <p class="config-ajuda">Tema, cores e tamanho da letra do app (menus, dashboard, fichas).</p>
+ 
+                        <label class="config-label">Tema</label>
+                        <div class="tema-lista" id="tema-lista">
+                            <button type="button" class="tema-btn ativo" data-tema="vinho">Vinho</button>
+                            <button type="button" class="tema-btn" data-tema="noite">Noite</button>
+                            <button type="button" class="tema-btn" data-tema="areia">Areia</button>
+                            <button type="button" class="tema-btn" data-tema="floresta">Floresta</button>
+                            <button type="button" class="tema-btn" data-tema="claro">Claro</button>
+                        </div>
+ 
+                        <div class="config-cores">
+                            <label>Fundo <input type="color" id="cfg-cor-fundo" value="#050308"></label>
+                            <label>Painel <input type="color" id="cfg-cor-painel" value="#1a0610"></label>
+                            <label>Borda <input type="color" id="cfg-cor-borda" value="#4a2030"></label>
+                            <label>Destaque <input type="color" id="cfg-cor-destaque" value="#c41e3a"></label>
+                            <label>Texto <input type="color" id="cfg-cor-texto" value="#f2e8ea"></label>
+                            <label>Texto 2 <input type="color" id="cfg-cor-texto2" value="#a08088"></label>
+                        </div>
+ 
+                        <label class="config-label" for="cfg-fonte">Tamanho da fonte: <span id="cfg-fonte-valor">100%</span></label>
+                        <input type="range" id="cfg-fonte" min="80" max="140" step="5" value="100">
+                    </article>
+ 
+                    <article class="config-card">
+                        <h3>Roadmap</h3>
+                        <p class="config-ajuda">So o mapa: pais, filhos, netos e o seletor de jogo. O painel da direita nao entra aqui.</p>
+ 
+                        <label class="config-label" for="cfg-fonte-mapa">Fonte dos nos: <span id="cfg-fonte-mapa-valor">100%</span></label>
+                        <input type="range" id="cfg-fonte-mapa" min="80" max="180" step="5" value="100">
+ 
+                        <label class="config-check">
+                            <input type="checkbox" id="cfg-auto-encaixar" checked>
+                            <span>Encaixar o mapa na tela ao abrir</span>
+                        </label>
+                        <label class="config-check">
+                            <input type="checkbox" id="cfg-tesoura" checked>
+                            <span>Mostrar tesoura para cortar linhas</span>
+                        </label>
+                    </article>
+ 
+                    <article class="config-card">
+                        <h3>Backup</h3>
+                        <p class="config-ajuda">O JSON e uma copia do que esta no navegador: ideias, tarefas e roadmap. Serve para nao perder nada se limpar o cache ou trocar de PC.</p>
+                        <div class="config-acoes">
+                            <button type="button" class="btn-config" id="cfg-exportar">Exportar JSON</button>
+                            <button type="button" class="btn-config btn-config-ghost" id="cfg-importar">Importar JSON</button>
+                            <button type="button" class="btn-config btn-config-perigo" id="cfg-resetar">Resetar dados</button>
+                        </div>
+                        <input type="file" id="cfg-arquivo" accept="application/json,.json" hidden>
+                        <p class="config-status" id="cfg-status"></p>
+                    </article>
+ 
+                    <article class="config-card">
+                        <h3>Autor</h3>
+                        <p class="config-ajuda">Seu cartao. Aparece embaixo do menu. Nao e formulario de suporte e nao vai sozinho para outra pessoa: so neste navegador, a menos que voce mande o backup JSON.</p>
+                        <label class="config-label" for="cfg-contato-nome">Nome</label>
+                        <input type="text" id="cfg-contato-nome" placeholder="Seu nome ou studio">
+                        <label class="config-label" for="cfg-contato-email">E-mail</label>
+                        <input type="email" id="cfg-contato-email" placeholder="voce@email.com">
+                        <label class="config-label" for="cfg-contato-recado">Recado</label>
+                        <textarea id="cfg-contato-recado" rows="4" placeholder="Discord, portfolio, uma frase..."></textarea>
+                    </article>
+ 
+                </div>
+            </section>
+ 
+        </main>
+    </div>
+ 
+     <script src="index.js"></script>
+</body>
+ 
+</html>
